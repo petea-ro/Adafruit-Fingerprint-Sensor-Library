@@ -75,6 +75,7 @@
   0x1B //!< Asks the sensor to search for a matching fingerprint template to the
        //!< last model generated
 #define FINGERPRINT_TEMPLATECOUNT 0x1D //!< Read finger template numbers
+#define FINGERPRINT_READCONLIST   0x1F //Read template index table
 #define FINGERPRINT_AURALEDCONFIG 0x35 //!< Aura LED control
 #define FINGERPRINT_LEDON 0x50         //!< Turn on the onboard LED
 #define FINGERPRINT_LEDOFF 0x51        //!< Turn off the onboard LED
@@ -157,6 +158,7 @@ struct Adafruit_Fingerprint_Packet {
   uint8_t type;        ///< Type of packet
   uint16_t length;     ///< Length of packet
   uint8_t data[256];    ///< The raw buffer for packet payload
+  
 };
 
 ///! Helper class to communicate with and keep state for fingerprint sensors
@@ -188,7 +190,10 @@ public:
   uint8_t fingerFastSearch(void);
   uint8_t fingerSearch(uint8_t slot = 1);
   uint8_t getTemplateCount(void);
+  uint8_t readNotepad(uint8_t slot);
   uint8_t setPassword(uint32_t password);
+  uint8_t readConList();
+  // uint8_t downChar(String data, uint8_t bufferID=1);
   uint8_t LEDcontrol(bool on);
   uint8_t LEDcontrol(uint8_t control, uint8_t speed, uint8_t coloridx,
                      uint8_t count = 0);
@@ -217,6 +222,8 @@ public:
       0xFFFFFFFF;             ///< The device address (set by getParameters)
   uint16_t packet_len = 128;   ///< The max packet length (set by getParameters)
   uint16_t baud_rate = 57600; ///< The UART baud rate (set by getParameters)
+  String notepad = "";  
+  bool tmplIndex[255]; //template indexes
 
 private:
   uint8_t checkPassword(void);

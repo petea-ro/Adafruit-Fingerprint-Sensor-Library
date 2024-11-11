@@ -466,6 +466,64 @@ uint8_t Adafruit_Fingerprint::getTemplateCount(void) {
   return packet.data[0];
 }
 
+uint8_t Adafruit_Fingerprint::readNotepad(uint8_t slot) {
+  GET_CMD_PACKET(0x19, slot);
+  
+  for(byte i=1; i<=32; i++){
+    if(packet.data[i]){
+      notepad += (char)packet.data[i];
+    }     
+  }
+  return packet.data[0];
+}
+
+/** retrieve all sesonsors locations status*/
+uint8_t Adafruit_Fingerprint::readConList(){
+  GET_CMD_PACKET(FINGERPRINT_READCONLIST, 0);
+  
+  uint8_t count = 32;
+  int index = 0;
+  
+  for(uint8_t i=1; i<count; i++)
+  {
+      
+      for(int8_t j=0; j<8; j++)
+      {
+          this->tmplIndex[index] = ((packet.data[i] >> j) & 1);
+          index++;
+      }
+      
+  }
+
+  return packet.data[0];
+}
+
+ /**
+   * The host computer downloads the feature file to a feature buffer of the  module. 
+   * Input parameter: data and  BufferID (buffer number 1 or 2)
+  */
+ /*
+  uint8_t Adafruit_Fingerprint::downChar(String data, uint8_t bufferID=1){
+    GET_CMD_PACKET(0x09, bufferID);
+
+    if(packet.data[0] == FINGERPRINT_OK){
+
+      uint16_t index = 0;
+      String chunk = data.substring(index, 245);
+
+      uint8_t packet_cmd = FINGERPRINT_DATAPACKET; // FINGERPRINT_ENDDATAPACKET
+      Adafruit_Fingerprint_Packet packet(packet_cmd, sizeof(chunk), chunk);                                    \
+      writeStructuredPacket(packet); 
+      getStructuredPacket(&packet);
+      
+    }
+    else{
+      log.error("Device not ready to recieve chars");
+    }
+  }
+*/
+ 
+
 /**************************************************************************/
 /*!
     @brief   Set the password on the sensor (future communication will require
